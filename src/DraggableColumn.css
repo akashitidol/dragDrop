@@ -1,0 +1,29 @@
+/* DraggableColumn.css */
+.draggable-column {
+    padding: 10px;
+    border-radius: 5px;
+    margin: 5px;
+    background-color: #fff;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    border: 2px dashed #ddd;
+    width: 2000px; /* Increase width for better visibility */
+    height: 450px;
+    cursor: grab;
+  }
+  
+  .column-title {
+    margin-bottom: 10px;
+    font-size: 16px;
+    color: #333;
+  }
+  
+  .draggable-item {
+    padding: 10px;
+    border: 1px solid #ddd;
+    margin-bottom: 5px;
+    background-color: #f9f9f9;
+    height: 100px;
+  }
+  
+
+  
