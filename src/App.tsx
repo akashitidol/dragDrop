@@ -11,7 +11,7 @@ interface DraggableColumnProps {
   id: string;
   title: string;
   items: (string | { [key: string]: string[] })[];
-  moveRow: (dragIndex: number, hoverIndex: number) => void;
+  moveRow: (columnId: string, dragIndex: number, hoverIndex: number) => void;
   moveColumn: (dragIndex: number, hoverIndex: number) => void;
   columnIndex: number;
 }
@@ -20,7 +20,7 @@ interface DraggableItemProps {
   id: string;
   index: number;
   text: string;
-  moveRow: (dragIndex: number, hoverIndex: number) => void;
+  moveRow: (columnId: string, dragIndex: number, hoverIndex: number) => void;
 }
 
 const DraggableItem: React.FC<DraggableItemProps> = ({ id, index, text, moveRow }) => {
@@ -43,7 +43,7 @@ const DraggableItem: React.FC<DraggableItemProps> = ({ id, index, text, moveRow 
         return;
       }
 
-      moveRow(dragIndex, hoverIndex);
+      moveRow(id, dragIndex, hoverIndex);
       item.index = hoverIndex;
     },
   });
@@ -93,7 +93,8 @@ const DraggableColumn: React.FC<DraggableColumnProps> = ({ id, title, items, mov
                 title={columnId}
                 items={item[columnId]}
                 //moveRow={(dragIndex, hoverIndex) => moveRow(columnId, dragIndex, hoverIndex)}
-                moveRow={(dragIndex, hoverIndex) => { }}
+                moveRow={(dragValue, dragIndex,hoverIndex) => moveRow(columnId, dragIndex, hoverIndex)}
+                //moveRow={(dragIndex, hoverIndex) => { }}
                 moveColumn={(dragIndex, hoverIndex) => moveColumn(dragIndex, hoverIndex)}
                 columnIndex={index}
               />
@@ -112,13 +113,28 @@ interface Columns {
 
 const App: React.FC = () => {
   const initialColumns: Columns = {
-    column1: [{ column11: ['Row 11', 'Row 12'] }, { column12: ['Row 11', 'Row 12'] }, { column13: ['Row 3'] }],
-    column2: ['Item A', 'Item B', 'Item C', 'Item D'],
+    column1: [
+      {column11: ['Row 11','Row 12']},
+      {column12: ['Row 11','Row 12']},
+      {column13: ['Row 3']}
+    ],
+    column2: [
+      'Item A',
+      'Item B',
+      'Item C',
+      {column22: ['Row 21','Row 22']}
+    ],
+    // column3: [
+    //   'Item A',
+    //   'Item B'
+    // ],
+
   };
 
   const [columns, setColumns] = React.useState<Columns>(initialColumns);
 
   const moveRowMain = (columnId: string, dragIndex: number, hoverIndex: number) => {
+    console.log(columnId,dragIndex,hoverIndex)
     const updatedColumns = { ...columns };
     const [removed] = updatedColumns[columnId].splice(dragIndex, 1);
     updatedColumns[columnId].splice(hoverIndex, 0, removed);
@@ -126,11 +142,11 @@ const App: React.FC = () => {
   };
 
   const moveColumnMain = (dragIndex: number, hoverIndex: number) => {
+    console.log(dragIndex,hoverIndex)
     const columnOrder = Object.keys(columns);
     const updatedColumns = { ...columns };
     const [draggedColumn] = columnOrder.splice(dragIndex, 1);
     columnOrder.splice(hoverIndex, 0, draggedColumn);
-
     const newColumns: Columns = {};
     columnOrder.forEach((columnId) => {
       newColumns[columnId] = updatedColumns[columnId];
@@ -147,7 +163,7 @@ const App: React.FC = () => {
             id={columnId}
             title={columnId}
             items={columns[columnId]}
-            moveRow={(dragIndex, hoverIndex) => moveRowMain(columnId, dragIndex, hoverIndex)}
+            moveRow={(dragValue, dragIndex,hoverIndex) => moveRowMain(columnId, dragIndex, hoverIndex)}
             moveColumn={(dragIndex, hoverIndex) => moveColumnMain(dragIndex, hoverIndex)}
             columnIndex={index}
           />
