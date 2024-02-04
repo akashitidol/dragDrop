@@ -83,23 +83,25 @@ const DraggableColumn: React.FC<DraggableColumnProps> = ({ id, title, items, mov
   return (
     <div className="draggable-column" ref={(node) => drag(drop(node))}>
       <h3 className="column-title">{title}</h3>
-      {items.map((item, index) => (
-        typeof item == "object" ?
-          Object.keys(item).map((columnId, index) => (
-            <DraggableColumn
-              key={columnId}
-              id={columnId}
-              title={columnId}
-              items={item[columnId]}
-              //moveRow={(dragIndex, hoverIndex) => moveRow(columnId, dragIndex, hoverIndex)}
-              moveRow={(dragIndex, hoverIndex) => {}}
-              moveColumn={(dragIndex, hoverIndex) => moveColumn(dragIndex, hoverIndex)}
-              columnIndex={index}
-            />
-          ))
-          :
-          <DraggableItem key={item.toString()} id={item.toString()} index={index} text={item.toString()} moveRow={moveRow} />
-      ))}
+      <div>
+        {items.map((item, index) => (
+          typeof item == "object" ?
+            Object.keys(item).map((columnId, index) => (
+              <DraggableColumn
+                key={columnId}
+                id={columnId}
+                title={columnId}
+                items={item[columnId]}
+                //moveRow={(dragIndex, hoverIndex) => moveRow(columnId, dragIndex, hoverIndex)}
+                moveRow={(dragIndex, hoverIndex) => { }}
+                moveColumn={(dragIndex, hoverIndex) => moveColumn(dragIndex, hoverIndex)}
+                columnIndex={index}
+              />
+            ))
+            :
+            <DraggableItem key={item.toString()} id={item.toString()} index={index} text={item.toString()} moveRow={moveRow} />
+        ))}
+      </div>
     </div>
   );
 };
@@ -110,7 +112,7 @@ interface Columns {
 
 const App: React.FC = () => {
   const initialColumns: Columns = {
-    column1: [{ column11: ['Row 11', 'Row 12'] }, { column12: ['Row 11', 'Row 12'] }, 'Row 3'],
+    column1: [{ column11: ['Row 11', 'Row 12'] }, { column12: ['Row 11', 'Row 12'] }, { column13: ['Row 3'] }],
     column2: ['Item A', 'Item B', 'Item C', 'Item D'],
   };
 
