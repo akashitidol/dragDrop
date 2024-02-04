@@ -10,7 +10,7 @@ import './DraggableColumn.css'; // Import the CSS file
 interface DraggableColumnProps {
   id: string;
   title: string;
-  items: string[];
+  items: (string | { [key: string]: string[] })[];
   moveRow: (dragIndex: number, hoverIndex: number) => void;
   moveColumn: (dragIndex: number, hoverIndex: number) => void;
   columnIndex: number;
@@ -84,32 +84,46 @@ const DraggableColumn: React.FC<DraggableColumnProps> = ({ id, title, items, mov
     <div className="draggable-column" ref={(node) => drag(drop(node))}>
       <h3 className="column-title">{title}</h3>
       {items.map((item, index) => (
-        <DraggableItem key={item} id={item} index={index} text={item} moveRow={moveRow} />
+        typeof item == "object" ?
+          Object.keys(item).map((columnId, index) => (
+            <DraggableColumn
+              key={columnId}
+              id={columnId}
+              title={columnId}
+              items={item[columnId]}
+              //moveRow={(dragIndex, hoverIndex) => moveRow(columnId, dragIndex, hoverIndex)}
+              moveRow={(dragIndex, hoverIndex) => {}}
+              moveColumn={(dragIndex, hoverIndex) => moveColumn(dragIndex, hoverIndex)}
+              columnIndex={index}
+            />
+          ))
+          :
+          <DraggableItem key={item.toString()} id={item.toString()} index={index} text={item.toString()} moveRow={moveRow} />
       ))}
     </div>
   );
 };
 
 interface Columns {
-  [key: string]: string[];
+  [key: string]: (string | { [key: string]: string[] })[];
 }
 
 const App: React.FC = () => {
   const initialColumns: Columns = {
-    column1: ['Row 1', 'Row 2', 'Row 3'],
-    column2: ['Item A', 'Item B', 'Item C'],
+    column1: [{ column11: ['Row 11', 'Row 12'] }, { column12: ['Row 11', 'Row 12'] }, 'Row 3'],
+    column2: ['Item A', 'Item B', 'Item C', 'Item D'],
   };
 
   const [columns, setColumns] = React.useState<Columns>(initialColumns);
 
-  const moveRow = (columnId: string, dragIndex: number, hoverIndex: number) => {
+  const moveRowMain = (columnId: string, dragIndex: number, hoverIndex: number) => {
     const updatedColumns = { ...columns };
     const [removed] = updatedColumns[columnId].splice(dragIndex, 1);
     updatedColumns[columnId].splice(hoverIndex, 0, removed);
     setColumns(updatedColumns);
   };
 
-  const moveColumn = (dragIndex: number, hoverIndex: number) => {
+  const moveColumnMain = (dragIndex: number, hoverIndex: number) => {
     const columnOrder = Object.keys(columns);
     const updatedColumns = { ...columns };
     const [draggedColumn] = columnOrder.splice(dragIndex, 1);
@@ -122,7 +136,6 @@ const App: React.FC = () => {
 
     setColumns(newColumns);
   };
-
   return (
     <DndProvider backend={HTML5Backend}>
       <div style={{ display: 'flex' }}>
@@ -132,8 +145,8 @@ const App: React.FC = () => {
             id={columnId}
             title={columnId}
             items={columns[columnId]}
-            moveRow={(dragIndex, hoverIndex) => moveRow(columnId, dragIndex, hoverIndex)}
-            moveColumn={(dragIndex, hoverIndex) => moveColumn(dragIndex, hoverIndex)}
+            moveRow={(dragIndex, hoverIndex) => moveRowMain(columnId, dragIndex, hoverIndex)}
+            moveColumn={(dragIndex, hoverIndex) => moveColumnMain(dragIndex, hoverIndex)}
             columnIndex={index}
           />
         ))}
