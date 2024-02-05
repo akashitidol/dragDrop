@@ -3,21 +3,24 @@
 import React from 'react';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
-import { useDrop, useDrag, DragPreviewImage, DropTargetMonitor } from 'react-dnd';
+import { useDrop, useDrag, DropTargetMonitor } from 'react-dnd';
+import { Resizable, ResizableBox } from 'react-resizable';
+import 'react-resizable/css/styles.css'; // Import the styles
 import './DraggableColumn.css'; // Import the CSS file
 
 interface Columns {
   [key: string]: (string | { [key: string]: string[] })[];
 }
+
 interface DraggableColumnProps {
-  columns:Columns
+  columns: Columns;
   id: string;
   title: string;
   items: (string | { [key: string]: string[] })[];
   moveRow: (columnId: string, dragIndex: number, hoverIndex: number) => void;
   moveColumn: (dragIndex: number, hoverIndex: number) => void;
   columnIndex: number;
-  setColumns: React.Dispatch<React.SetStateAction<Columns>>
+  setColumns: React.Dispatch<React.SetStateAction<Columns>>;
 }
 
 interface DraggableItemProps {
@@ -27,7 +30,7 @@ interface DraggableItemProps {
   moveRow: (columnId: string, dragIndex: number, hoverIndex: number) => void;
 }
 
-const DraggableItem: React.FC<DraggableItemProps> = ({ id, index, text, moveRow }) => {
+const ResizableDraggableItem: React.FC<DraggableItemProps> = ({ id, index, text, moveRow }) => {
   const [, drag] = useDrag({
     type: 'ROW',
     item: { id, index },
@@ -53,13 +56,24 @@ const DraggableItem: React.FC<DraggableItemProps> = ({ id, index, text, moveRow 
   });
 
   return (
-    <div className="draggable-item" ref={(node) => drag(drop(node))}>
-      {text}
-    </div>
+    <ResizableBox width={200} height={50} handle={<div className="resize-handle" />}>
+      <div className="draggable-item" ref={(node) => drag(drop(node))}>
+        {text}
+      </div>
+    </ResizableBox>
   );
 };
 
-const DraggableColumn: React.FC<DraggableColumnProps> = ({ columns,id, title, items, moveRow, moveColumn, columnIndex, setColumns}) => {
+const ResizableDraggableColumn: React.FC<DraggableColumnProps> = ({
+  columns,
+  id,
+  title,
+  items,
+  moveRow,
+  moveColumn,
+  columnIndex,
+  setColumns,
+}) => {
   const [, drop] = useDrop({
     accept: 'COLUMN',
     hover: (item: { index: number }, monitor: DropTargetMonitor) => {
@@ -85,33 +99,40 @@ const DraggableColumn: React.FC<DraggableColumnProps> = ({ columns,id, title, it
   });
 
   return (
-    <div className="draggable-column" ref={(node) => drag(drop(node))}>
-      <h3 className="column-title">{title}</h3>
-      <div className={title}>
-        {items.map((item, index) => (
-          typeof item == "object" ?
-            Object.keys(item).map((columnId, index) => (
-              <DraggableColumn
-                columns={columns}
-                key={columnId}
-                id={columnId}
-                title={columnId}
-                items={item[columnId]}
-                moveRow={(dragValue, dragIndex,hoverIndex) => moveRowTemp(columnId, dragIndex, hoverIndex,columns,setColumns)}
-                moveColumn={(dragIndex, hoverIndex) => moveColumnTemp(columns,dragIndex, hoverIndex,setColumns)}
-                columnIndex={index}
-                setColumns={setColumns}
+    <ResizableBox width={200} height={200} handle={<div className="resize-handle" />}>
+      <div className="draggable-column" ref={(node) => drag(drop(node))}>
+        <h3 className="column-title">{title}</h3>
+        <div className={title}>
+          {items.map((item, index) => (
+            typeof item == 'object' ? (
+              Object.keys(item).map((columnId, index) => (
+                <ResizableDraggableColumn
+                  columns={columns}
+                  key={columnId}
+                  id={columnId}
+                  title={columnId}
+                  items={item[columnId]}
+                  moveRow={(dragValue, dragIndex, hoverIndex) => moveRowTemp(columnId, dragIndex, hoverIndex, columns, setColumns)}
+                  moveColumn={(dragIndex, hoverIndex) => moveColumnTemp(columns, dragIndex, hoverIndex, setColumns)}
+                  columnIndex={index}
+                  setColumns={setColumns}
+                />
+              ))
+            ) : (
+              <ResizableDraggableItem
+                key={item.toString()}
+                id={item.toString()}
+                index={index}
+                text={item.toString()}
+                moveRow={moveRow}
               />
-            ))
-            :
-            <DraggableItem key={item.toString()} id={item.toString()} index={index} text={item.toString()} moveRow={moveRow} />
-        ))}
+            )
+          ))}
+        </div>
       </div>
-    </div>
+    </ResizableBox>
   );
 };
-
-
 
 const moveColumnTemp = (
   columns: Columns,
@@ -141,19 +162,19 @@ const moveRowTemp = (
   setColumns: React.Dispatch<React.SetStateAction<Columns>>
 ) => {
   const updatedColumns: Columns = { ...columns };
-  let parentKey:any = getParentByKey(columns,columnId)==undefined?"":getParentByKey(columns,columnId);
-  if(parentKey !==""){
-    var tempArray = getElementByKey(columns, parentKey,columnId);
-    if(tempArray){
+  let parentKey: any = getParentByKey(columns, columnId) == undefined ? "" : getParentByKey(columns, columnId);
+  if (parentKey !== "") {
+    var tempArray = getElementByKey(columns, parentKey, columnId);
+    if (tempArray) {
       const [removed] = tempArray.splice(dragIndex, 1);
       tempArray.splice(hoverIndex, 0, removed);
-      setColumns(updateElementByKey(updatedColumns,parentKey,columnId,tempArray));
+      setColumns(updateElementByKey(updatedColumns, parentKey, columnId, tempArray));
     }
-  }else{
-    if(updatedColumns[columnId] !== undefined){
+  } else {
+    if (updatedColumns[columnId] !== undefined) {
       const [removed] = updatedColumns[columnId].splice(dragIndex, 1);
       updatedColumns[columnId].splice(hoverIndex, 0, removed);
-    
+
       setColumns(updatedColumns);
     }
   }
@@ -178,6 +199,7 @@ const getParentByKey = (
 
   return '';
 };
+
 const getElementByKey = (
   columns: Columns,
   columnKey: string,
@@ -227,50 +249,28 @@ const updateElementByKey = (
 const App: React.FC = () => {
   const initialColumns: Columns = {
     column1: [
-      {column11: ['child 11','child 12','child 13',]},
-      {column12: ['Row 11','Row 12','Row 13']},
-      {column13: ['San 11','San 12','San 13']},
+      { column11: ['child 11', 'child 12', 'child 13'] },
+      { column12: ['Row 11', 'Row 12', 'Row 13'] },
+      { column13: ['San 11', 'San 12', 'San 13'] },
     ],
-    column2: ['Item A','Item B','Item C',],
-    column3: ['Kite A','Kite B','Kite C',]
+    column2: ['Item A', 'Item B', 'Item C'],
+    column3: ['Kite A', 'Kite B', 'Kite C'],
   };
 
   const [columns, setColumns] = React.useState<Columns>(initialColumns);
-
-  /*const moveRowMain = (columnId: string, dragIndex: number, hoverIndex: number) => {
-    console.log("ROW",columnId,dragIndex,hoverIndex)
-    const updatedColumns = { ...columns };
-    const [removed] = updatedColumns[columnId].splice(dragIndex, 1);
-    updatedColumns[columnId].splice(hoverIndex, 0, removed);
-    setColumns(updatedColumns);
-  };
-
-  const moveColumnMain = (dragIndex: number, hoverIndex: number) => {
-    console.log("Column",dragIndex,hoverIndex)
-    const columnOrder = Object.keys(columns);
-    const updatedColumns = { ...columns };
-    const [draggedColumn] = columnOrder.splice(dragIndex, 1);
-    columnOrder.splice(hoverIndex, 0, draggedColumn);
-    const newColumns: Columns = {};
-    columnOrder.forEach((columnId) => {
-      newColumns[columnId] = updatedColumns[columnId];
-    });
-
-    setColumns(newColumns);
-  };*/
 
   return (
     <DndProvider backend={HTML5Backend}>
       <div style={{ display: 'flex' }}>
         {Object.keys(columns).map((columnId, index) => (
-          <DraggableColumn
-            columns = {columns}
+          <ResizableDraggableColumn
+            columns={columns}
             key={columnId}
             id={columnId}
             title={columnId}
             items={columns[columnId]}
-            moveRow={(dragValue, dragIndex,hoverIndex) => moveRowTemp(columnId, dragIndex, hoverIndex,columns,setColumns)}
-            moveColumn={(dragIndex, hoverIndex) => moveColumnTemp(columns,dragIndex, hoverIndex,setColumns)}
+            moveRow={(dragValue, dragIndex, hoverIndex) => moveRowTemp(columnId, dragIndex, hoverIndex, columns, setColumns)}
+            moveColumn={(dragIndex, hoverIndex) => moveColumnTemp(columns, dragIndex, hoverIndex, setColumns)}
             columnIndex={index}
             setColumns={setColumns}
           />

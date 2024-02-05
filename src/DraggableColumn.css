@@ -1,48 +1,59 @@
 /* DraggableColumn.css */
 
 .draggable-column {
-  padding: 10px;
-  border-radius: 5px;
-  margin: 5px;
-  background-color: #fff;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  border: 2px dashed #ddd;
-  width: auto;
-  min-width: 400px;
-  height: auto;
+  padding: 15px;
+  border-radius: 8px;
+  margin: 10px;
+  background-color: #ffffff;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  border: 2px solid #ddd;
+  min-width: 300px;
+  min-height: 200px;
   cursor: grab;
-}
-
-.draggable-column .column11, .column12 {
+  transition: box-shadow 0.3s ease;
   display: flex;
+  flex-direction: column;
 }
 
-.draggable-column .column11 .draggable-item, .column12 .draggable-item {
+.draggable-column:hover {
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+}
+
+.draggable-column .column11,
+.draggable-column .column12 {
+  display: flex;
+  flex-wrap: wrap;
+  margin-right: -5px;
+}
+
+.draggable-column .draggable-item {
+  padding: 12px;
+  border: 1px solid #ddd;
+  margin-bottom: 8px;
+  background-color: #f9f9f9;
   min-width: 120px;
+  border-radius: 5px;
+  transition: background-color 0.3s ease;
+}
+
+.draggable-column .draggable-item:hover {
+  background-color: #e5e5e5;
 }
 
 .column-title {
-  margin-bottom: 10px;
-  font-size: 16px;
+  margin-bottom: 15px;
+  font-size: 18px;
+  font-weight: bold;
   color: #333;
 }
 
-.draggable-item {
-  padding: 10px;
-  border: 1px solid #ddd;
-  margin-bottom: 5px;
-  background-color: #f9f9f9;
-  min-height: 80px;
-  height: auto;
-  margin-right: 5px;
-}
-
-.resizable-handle {
-  width: 10px;
-  height: 100%;
+.resize-handle {
+  width: 12px;
+  height: 12px;
+  background-color: #ddd;
   position: absolute;
+  bottom: 0;
   right: 0;
-  top: 0;
-  cursor: ew-resize;
-  background: transparent;
+  cursor: se-resize;
+  border-radius: 3px;
 }
