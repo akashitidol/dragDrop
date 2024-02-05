@@ -261,7 +261,7 @@ const App: React.FC = () => {
 
   return (
     <DndProvider backend={HTML5Backend}>
-      <div style={{ display: 'flex' }}>
+      <div style={{ display: 'flex' }} className="mainblock">
         {Object.keys(columns).map((columnId, index) => (
           <ResizableDraggableColumn
             columns={columns}
