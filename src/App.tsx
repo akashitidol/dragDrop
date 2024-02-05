@@ -87,7 +87,7 @@ const DraggableColumn: React.FC<DraggableColumnProps> = ({ columns,id, title, it
   return (
     <div className="draggable-column" ref={(node) => drag(drop(node))}>
       <h3 className="column-title">{title}</h3>
-      <div>
+      <div className={title}>
         {items.map((item, index) => (
           typeof item == "object" ?
             Object.keys(item).map((columnId, index) => (
@@ -119,7 +119,6 @@ const moveColumnTemp = (
   hoverIndex: number,
   setColumns: React.Dispatch<React.SetStateAction<Columns>>
 ) => {
-  console.log("hellow");
   const columnOrder = Object.keys(columns);
   const updatedColumns: Columns = { ...columns };
 
@@ -230,33 +229,36 @@ const App: React.FC = () => {
     column1: [
       {column11: ['child 11','child 12','child 13',]},
       {column12: ['Row 11','Row 12','Row 13']},
+      {column13: ['San 11','San 12','San 13']},
     ],
-    column2: ['Item A','Item B','Item C',]
+    column2: ['Item A','Item B','Item C',],
+    column3: ['Kite A','Kite B','Kite C',]
   };
 
   const [columns, setColumns] = React.useState<Columns>(initialColumns);
 
-  // const moveRowMain = (columnId: string, dragIndex: number, hoverIndex: number) => {
-  //   console.log("ROW",columnId,dragIndex,hoverIndex)
-  //   const updatedColumns = { ...columns };
-  //   const [removed] = updatedColumns[columnId].splice(dragIndex, 1);
-  //   updatedColumns[columnId].splice(hoverIndex, 0, removed);
-  //   setColumns(updatedColumns);
-  // };
+  /*const moveRowMain = (columnId: string, dragIndex: number, hoverIndex: number) => {
+    console.log("ROW",columnId,dragIndex,hoverIndex)
+    const updatedColumns = { ...columns };
+    const [removed] = updatedColumns[columnId].splice(dragIndex, 1);
+    updatedColumns[columnId].splice(hoverIndex, 0, removed);
+    setColumns(updatedColumns);
+  };
 
-  // const moveColumnMain = (dragIndex: number, hoverIndex: number) => {
-  //   console.log("Column",dragIndex,hoverIndex)
-  //   const columnOrder = Object.keys(columns);
-  //   const updatedColumns = { ...columns };
-  //   const [draggedColumn] = columnOrder.splice(dragIndex, 1);
-  //   columnOrder.splice(hoverIndex, 0, draggedColumn);
-  //   const newColumns: Columns = {};
-  //   columnOrder.forEach((columnId) => {
-  //     newColumns[columnId] = updatedColumns[columnId];
-  //   });
+  const moveColumnMain = (dragIndex: number, hoverIndex: number) => {
+    console.log("Column",dragIndex,hoverIndex)
+    const columnOrder = Object.keys(columns);
+    const updatedColumns = { ...columns };
+    const [draggedColumn] = columnOrder.splice(dragIndex, 1);
+    columnOrder.splice(hoverIndex, 0, draggedColumn);
+    const newColumns: Columns = {};
+    columnOrder.forEach((columnId) => {
+      newColumns[columnId] = updatedColumns[columnId];
+    });
 
-  //   setColumns(newColumns);
-  // };
+    setColumns(newColumns);
+  };*/
+
   return (
     <DndProvider backend={HTML5Backend}>
       <div style={{ display: 'flex' }}>
